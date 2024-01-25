@@ -1,5 +1,6 @@
 import { App, inject } from 'vue'
 import { defer, Deferred } from '../utils/defer.ts'
+import { PLUGIN_NAME } from '../../plugin.ts'
 
 export function isRedirect(
     redirect: RedirectLocation,
@@ -57,7 +58,7 @@ export function useClientRedirect(
     }
 }
 
-export const REDIRECT_SYMBOL_WANNABE = '__wite-wue-ssr-new-redirect' // Symbol()
+export const REDIRECT_SYMBOL_WANNABE = `${PLUGIN_NAME}.redirect` // Symbol()
 
 export function provideRedirect(app: App, redirect: RedirectFunction): void {
     app.provide(REDIRECT_SYMBOL_WANNABE, redirect)

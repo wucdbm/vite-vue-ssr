@@ -1,5 +1,4 @@
 import * as connect from 'connect'
-// import fs from 'node:fs'
 import { InlineConfig } from 'vite'
 
 export interface PluginConfig {

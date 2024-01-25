@@ -230,7 +230,7 @@ async function resolveClientOptions(
                           plugins: [
                               inputFileName !== 'index.html'
                                   ? {
-                                        name: 'wite-wue-ssr-name-resolver',
+                                        name: `${PLUGIN_NAME}-name-resolver`,
                                         generateBundle(_options, bundle) {
                                             // Rename custom name to index.html
                                             const htmlAsset =

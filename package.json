@@ -1,7 +1,7 @@
 {
-    "name": "wite-wue-ssr-new",
+    "name": "wucdbm-vite-vue-ssr-builder",
     "private": false,
-    "description": "Vue/Vite utility for building and server side rendering",
+    "description": "Vue/Vite utility for building your app and running SSR in DEV",
     "version": "0.0.1",
     "type": "module",
     "main": "./dist/index.js",

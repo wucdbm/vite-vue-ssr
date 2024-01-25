@@ -1,11 +1,13 @@
-import path from 'node:path'
-import fs from 'node:fs'
-import { ServerResponse } from 'node:http'
+import * as path from 'node:path'
+import * as fs from 'node:fs'
+import type { ServerResponse } from 'node:http'
 import { IncomingMessage, NextHandleFunction } from 'connect'
 import { ViteDevServer } from 'vite'
 import { AppEntryPoint } from '../types'
 import { isRedirect } from '../plugins/redirect'
 import { PluginConfig } from '../../config'
+
+console.log(path, fs)
 
 export const createSSRDevHandler = async (
     server: ViteDevServer,

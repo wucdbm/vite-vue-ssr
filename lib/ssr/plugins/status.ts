@@ -1,4 +1,5 @@
 import { App, inject } from 'vue'
+import { PLUGIN_NAME } from '../../plugin.ts'
 
 export type SetStatusState = {
     readonly status: number | undefined
@@ -20,7 +21,7 @@ export function createSetStatusState(): SetStatusState {
     }
 }
 
-export const STATUS_SYMBOL_WANNABE = '__wite-wue-ssr-new-status' // Symbol()
+export const STATUS_SYMBOL_WANNABE = `${PLUGIN_NAME}.status`
 
 export function provideSetStatus(app: App, statusState: SetStatusState): void {
     app.provide(STATUS_SYMBOL_WANNABE, statusState)

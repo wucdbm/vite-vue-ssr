@@ -19,6 +19,11 @@ export default defineConfig({
         },
         rollupOptions: {
             external: [
+                // Node Builtins
+                'node:path',
+                'node:http',
+                'node:fs',
+                // Libs
                 '@unhead/ssr',
                 '@unhead/vue',
                 '@unhead/head',
@@ -27,6 +32,7 @@ export default defineConfig({
                 'node-fetch',
                 'vite',
                 'vue',
+                '@vue/server-renderer',
                 'vue-router',
             ],
             output: {
