@@ -1,26 +1,24 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
-import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-    plugins: [dts({ include: ['lib'] })],
     build: {
+        outDir: './dist/cli',
+        emptyOutDir: false,
         copyPublicDir: false,
         lib: {
-            entry: resolve(__dirname, 'lib/index.ts'),
+            entry: resolve(__dirname, 'lib/cli/index.ts'),
             formats: ['es'],
         },
         rollupOptions: {
-            external: ['vue', 'vue-router'],
             output: {
-                assetFileNames: 'assets/[name][extname]',
                 entryFileNames: '[name].js',
             },
         },
     },
     resolve: {
         alias: {
-            '@': resolve('lib/'),
+            '@': resolve(__dirname, 'lib/'),
         },
     },
 })
