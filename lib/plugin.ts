@@ -7,7 +7,7 @@ export const PLUGIN_NAME: string = 'wite-wue-ssr-new'
 export function WiteWueSsrPluginNew(options: PluginConfig = {}): PluginOption {
     return {
         name: PLUGIN_NAME,
-        viteSsrOptions: options,
+        [PLUGIN_NAME]: options,
         config() {
             return {
                 ssr: {

@@ -28,24 +28,19 @@ export interface BuildOptions {
     /**
      * Vite options applied only to the client build
      */
-    clientOptions?: ClientBuildConfig
+    clientOptions?: InlineConfig
     /**
-     * Vite options applied only to the server build + packageJson
+     * Vite options applied only to the server build
      */
-    serverOptions?: ServerBuildConfig
-    /**
-     * Remove the index.html generated in the client build
-     * @default false
-     */
-    removeIndexHtml?: boolean
-}
-
-export interface ClientBuildConfig extends InlineConfig {}
-
-export interface ServerBuildConfig extends InlineConfig {
+    serverOptions?: InlineConfig
     /**
      * Extra properties to include in the generated server package.json,
      * or 'false' to avoid generating it.
      */
     packageJson?: Record<string, unknown> | false
+    /**
+     * Remove the index.html generated in the client build
+     * @default false
+     */
+    removeIndexHtml?: boolean
 }

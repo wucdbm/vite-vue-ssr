@@ -1,4 +1,11 @@
-import { build, mergeConfig, resolveConfig, ResolvedConfig } from 'vite'
+import {
+    build,
+    mergeConfig,
+    resolveConfig,
+    ResolvedConfig,
+    Plugin,
+    InlineConfig,
+} from 'vite'
 import replace from '@rollup/plugin-replace'
 import fs from 'fs'
 import path from 'path'
@@ -10,7 +17,7 @@ import type {
     RollupWatcher,
     RollupWatcherEvent,
 } from 'rollup'
-import { ClientBuildConfig, PluginConfig, ServerBuildConfig } from '../config'
+import { PluginConfig } from '../config'
 import { PLUGIN_NAME } from '../plugin'
 
 export interface CliConfig {
@@ -27,9 +34,16 @@ export async function buildClientAndServer(config: CliConfig): Promise<void> {
 }
 
 export function getPluginOptions(viteConfig: ResolvedConfig): PluginConfig {
-    return ((
-        viteConfig.plugins.find((plugin) => plugin.name === PLUGIN_NAME) as any
-    )?.viteSsrOptions || {}) as PluginConfig
+    const config: Plugin<{ asd: string }> | undefined = viteConfig.plugins.find(
+        (plugin) => plugin.name === PLUGIN_NAME,
+    )
+
+    if (!config) {
+        return {}
+    }
+
+    // @ts-expect-error No index signature with a parameter of type string was found on type Plugin<any>
+    return config[PLUGIN_NAME] as unknown as PluginConfig
 }
 
 export async function resolveViteConfig(
@@ -138,6 +152,7 @@ async function doBuildClientAndServer(
             viteConfig,
             clientBuildOptions,
             serverBuildOptions,
+            pluginOptions.build?.packageJson,
         )
 
         return onFirstBuild()
@@ -180,6 +195,7 @@ async function doBuildClientAndServer(
             viteConfig,
             clientBuildOptions,
             serverBuildOptions,
+            pluginOptions.build?.packageJson,
         )
 
         if (!resolved) {
@@ -194,12 +210,12 @@ async function resolveClientOptions(
     viteConfig: ResolvedConfig,
     pluginConfig: PluginConfig,
     cliConfig: CliConfig,
-): Promise<ClientBuildConfig> {
+): Promise<InlineConfig> {
     const inputFilePath = pluginConfig.input || ''
     const defaultFilePath = path.resolve(viteConfig.root, 'index.html')
     const inputFileName = inputFilePath.split('/').pop() || 'index.html'
 
-    const defaultConfig: ClientBuildConfig = {
+    const defaultConfig: InlineConfig = {
         mode: viteConfig.mode,
         build: {
             outDir: path.resolve(distDir, 'client'),
@@ -243,10 +259,11 @@ async function resolveServerOptions(
     pluginConfig: PluginConfig,
     cliConfig: CliConfig,
     viteCoreDependencies: string[],
-): Promise<ServerBuildConfig> {
-    const defaultOptions: ServerBuildConfig = {
+): Promise<InlineConfig> {
+    const defaultOptions: InlineConfig = {
         mode: viteConfig.mode,
-        publicDir: false, // No need to copy public files to SSR directory
+        // No need to copy public files to SSR directory
+        publicDir: false,
         build: {
             outDir: path.resolve(distDir, 'server'),
             // The plugin is already changing the vite-ssr alias to point to the server-entry.
@@ -289,10 +306,11 @@ function isWatching(
 
 async function generatePackageJson(
     viteConfig: ResolvedConfig,
-    clientConfig: ClientBuildConfig,
-    serverConfig: ServerBuildConfig,
+    clientConfig: InlineConfig,
+    serverConfig: InlineConfig,
+    packageJson: Record<string, unknown> | false | undefined,
 ) {
-    if (serverConfig.packageJson === false) {
+    if (packageJson === false) {
         return
     }
 
@@ -305,25 +323,21 @@ async function generatePackageJson(
             ((viteConfig.build?.ssr || serverConfig.build?.ssr) as string),
     )
 
-    const moduleFormat =
-        (viteConfig.build?.rollupOptions?.output as OutputOptions)?.format ||
-        (serverConfig.build?.rollupOptions?.output as OutputOptions)?.format
-
-    const packageJson = {
+    const packageJsonContents = {
         main: outputFile ? ssrOutput.base : ssrOutput.name + '.js',
-        type: /^esm?$/i.test(moduleFormat || '') ? 'module' : 'commonjs',
+        type: 'module',
         ssr: {
             // This can be used later to serve static assets
             assets: fs
                 .readdirSync(clientConfig.build?.outDir as string)
                 .filter((file) => !/(index\.html|manifest\.json)$/i.test(file)),
         },
-        ...(serverConfig.packageJson || {}),
+        ...(packageJson || {}),
     }
 
     fs.writeFileSync(
         path.join(serverConfig.build?.outDir as string, 'package.json'),
-        JSON.stringify(packageJson, null, 2),
+        JSON.stringify(packageJsonContents, null, 2),
         'utf-8',
     )
 }
