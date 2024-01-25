@@ -1,23 +1,17 @@
-import { build, ResolvedConfig, mergeConfig } from 'vite'
+import { build, mergeConfig, resolveConfig, ResolvedConfig } from 'vite'
 import replace from '@rollup/plugin-replace'
 import fs from 'fs'
 import path from 'path'
 import { JSDOM } from 'jsdom'
 import type {
-    RollupOutput,
-    RollupWatcher,
     OutputAsset,
     OutputOptions,
+    RollupOutput,
+    RollupWatcher,
     RollupWatcherEvent,
 } from 'rollup'
-import {
-    getPluginOptions,
-    resolveViteConfig,
-    resolveEntryServerAbsolute,
-    ServerBuildConfig,
-    ClientBuildConfig,
-    PluginConfig,
-} from '../config.js'
+import { ClientBuildConfig, PluginConfig, ServerBuildConfig } from '../config'
+import { PLUGIN_NAME } from '../plugin'
 
 export interface CliConfig {
     mode?: string
@@ -30,6 +24,38 @@ export async function buildClientAndServer(config: CliConfig): Promise<void> {
     return new Promise((resolve, reject) => {
         doBuildClientAndServer(config, resolve).catch(reject)
     })
+}
+
+export function getPluginOptions(viteConfig: ResolvedConfig): PluginConfig {
+    return ((
+        viteConfig.plugins.find((plugin) => plugin.name === PLUGIN_NAME) as any
+    )?.viteSsrOptions || {}) as PluginConfig
+}
+
+export async function resolveViteConfig(
+    mode?: string,
+): Promise<ResolvedConfig> {
+    return resolveConfig(
+        {},
+        'build',
+        mode || process.env.MODE || process.env.NODE_ENV,
+    )
+}
+
+export async function resolveEntryServerAbsolute(
+    config: ResolvedConfig,
+    options: PluginConfig,
+): Promise<string> {
+    const entryServer = options.entryServer || '/src/entry-server.ts'
+
+    return resolveEntryAbsolute(config, entryServer)
+}
+
+export function resolveEntryAbsolute(
+    config: ResolvedConfig,
+    entryFile: string,
+): string {
+    return path.join(config.root, entryFile)
 }
 
 async function doBuildClientAndServer(

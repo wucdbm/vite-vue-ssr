@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { buildClientAndServer } from './build.js'
-import type { CliConfig } from './build.js'
+import { buildClientAndServer } from './build'
+import type { CliConfig } from './build'
 
 const [, , ...args] = process.argv
 
