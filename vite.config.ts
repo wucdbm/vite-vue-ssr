@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
+import { name } from './package.json'
 
 export default defineConfig({
     plugins: [
@@ -45,5 +46,8 @@ export default defineConfig({
         alias: {
             '@': resolve('lib/'),
         },
+    },
+    define: {
+        PLUGIN_NAME: JSON.stringify(name),
     },
 })

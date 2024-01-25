@@ -1,4 +1,4 @@
-export { WucdbmViteVueSsr, PLUGIN_NAME } from './plugin'
+export { WucdbmViteVueSsr } from './plugin'
 export { ClientOnly } from './components/client-only'
 export {
     provideRedirect,

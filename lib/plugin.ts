@@ -2,8 +2,6 @@ import type { PluginOption } from 'vite'
 import type { PluginConfig } from './config'
 import { createSSRDevHandler } from './ssr/dev'
 
-export const PLUGIN_NAME: string = 'wucdbm-vite-vue-ssr-builder' as const
-
 export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
     return {
         name: PLUGIN_NAME,

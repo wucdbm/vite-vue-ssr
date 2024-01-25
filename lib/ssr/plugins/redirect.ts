@@ -1,6 +1,5 @@
 import { App, inject } from 'vue'
 import { defer, Deferred } from '../utils/defer.ts'
-import { PLUGIN_NAME } from '../../plugin.ts'
 
 export function isRedirect(
     redirect: RedirectLocation,

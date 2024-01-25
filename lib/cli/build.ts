@@ -18,7 +18,6 @@ import type {
     RollupWatcherEvent,
 } from 'rollup'
 import { PluginConfig } from '../config'
-import { PLUGIN_NAME } from '../plugin'
 
 export interface CliConfig {
     mode?: string

@@ -1,5 +1,4 @@
 import { App, inject } from 'vue'
-import { PLUGIN_NAME } from '../../plugin.ts'
 
 export type SetStatusState = {
     readonly status: number | undefined

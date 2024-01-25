@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import { name } from './package.json'
 
 export default defineConfig({
     build: {
@@ -20,5 +21,8 @@ export default defineConfig({
         alias: {
             '@': resolve(__dirname, 'lib/'),
         },
+    },
+    define: {
+        PLUGIN_NAME: JSON.stringify(name),
     },
 })
