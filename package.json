@@ -2,11 +2,13 @@
     "name": "wucdbm-vite-vue-ssr",
     "private": false,
     "description": "Vue/Vite utility for building your app and running SSR in DEV",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "bin": "./dist/cli/index.js",
+    "bin": {
+        "wucdbm-vite-vue-ssr": "dist/cli/index.js"
+    },
     "files": [
         "dist",
         "LICENSE",
@@ -21,8 +23,6 @@
         "build": "yarn build:lib && yarn build:cli",
         "build:lib": "tsc --p ./tsconfig-build.json && vite build",
         "build:cli": "tsc --p ./tsconfig-build.json && vite build --config vite-cli.config.ts --ssr",
-        "build:cli1test": "tsc --p ./tsconfig-cli.json && vite build --config vite-cli.config.ts",
-        "build:cli2test": "tsc --p ./tsconfig-cli.json",
         "prepublishOnly": "npm run build",
         "lint": "eslint .",
         "format": "prettier --write .",
