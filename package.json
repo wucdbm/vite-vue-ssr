@@ -71,15 +71,8 @@
         "prettier": "^3.2.4",
         "typescript": "^5.2.2",
         "node-fetch": "~2 || ~3",
-        "vite": "^5.0.12"
-    },
-    "dependencies": {
-        "@vercel/ncc": "^0.38.1",
-        "vite-plugin-dts": "^3.7.2",
-        "vue": "^3.4.15",
-        "vue-router": "^4.2.5",
-        "@unhead/ssr": "^1.8.10",
-        "@unhead/vue": "^1.8.10"
+        "vite": "^5.0.12",
+        "vite-plugin-dts": "^3.7.2"
     },
     "lint-staged": {
         "**/*.{js,ts,tsx}": [
