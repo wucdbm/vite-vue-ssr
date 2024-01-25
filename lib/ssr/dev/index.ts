@@ -7,8 +7,6 @@ import { AppEntryPoint } from '../types'
 import { isRedirect } from '../plugins/redirect'
 import { PluginConfig } from '../../config'
 
-console.log(path, fs)
-
 export const createSSRDevHandler = async (
     server: ViteDevServer,
     options: PluginConfig = {},
