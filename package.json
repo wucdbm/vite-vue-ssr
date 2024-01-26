@@ -74,6 +74,12 @@
         "vite": "^5.0.12",
         "vite-plugin-dts": "^3.7.2"
     },
+    "dependencies": {
+        "vue": "^3.4.15",
+        "vue-router": "^4.2.5",
+        "@unhead/ssr": "^1.8.10",
+        "@unhead/vue": "^1.8.10"
+    },
     "lint-staged": {
         "**/*.{js,ts,tsx}": [
             "eslint --fix"
