@@ -16,4 +16,5 @@ export {
     renderApp,
     createPreloadLinks,
     createPreloadHeaders,
+    getExpressPath,
 } from './ssr/index'

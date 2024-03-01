@@ -23,13 +23,13 @@ import { Unhead } from '@unhead/schema'
 export async function renderApp<R = Record<string, unknown>>({
     factory,
     replacer,
-    request,
+    path,
     ssrManifest,
     hooks,
 }: {
     factory: AppFactory
     replacer: HtmlReplacer
-    request: connect.IncomingMessage
+    path: string
     ssrManifest?: SSRManifest
     hooks?: Hooks<R>
 }): Promise<ServerSideResponse<R>> {
@@ -52,8 +52,6 @@ export async function renderApp<R = Record<string, unknown>>({
 
     const statusState = createSetStatusState()
     provideSetStatus(app, statusState)
-
-    let path = getPath(request)
 
     if (baseUrl && path.startsWith(baseUrl)) {
         path = path.slice(baseUrl.length)
@@ -243,57 +241,14 @@ export function createLinks(
     return links
 }
 
-function getPath(request: connect.IncomingMessage): string {
+export function getExpressPath(request: connect.IncomingMessage): string {
     if (request.originalUrl) {
         return request.originalUrl
-        // return new URL(request.originalUrl, `${protocol}://${request.headers.host}`)
     }
 
     if (request.url) {
         return request.url
-        // return new URL(request.url, `${protocol}://${request.headers.host}`)
     }
 
     return '/'
-    // return new URL(`${protocol}://${request.headers.host}`)
 }
-
-// function getUrl(request: connect.IncomingMessage): URL {
-//     const protocol = getProtocol(request)
-//
-//     if (request.originalUrl) {
-//         return new URL(request.originalUrl, `${protocol}://${request.headers.host}`)
-//     }
-//
-//     if (request.url) {
-//         return new URL(request.url, `${protocol}://${request.headers.host}`)
-//     }
-//
-//     return new URL(`${protocol}://${request.headers.host}`)
-// }
-
-// type ObjectAndProp<T, P extends string, PT> = T & {
-//     [Z in P]: PT
-// }
-
-// function hasProperty<T, PT>(object: T, prop: string): object is ObjectAndProp<T, typeof prop, PT> {
-//     return prop in object
-// }
-
-// function getProtocol(request: connect.IncomingMessage): string {
-//     if (hasProperty<connect.IncomingMessage, string>(request, 'protocol')) {
-//         return request.protocol
-//     }
-//
-//     const headers = request.headers
-//
-//     if (headers.referer) {
-//         const parts = headers.referer.split(':')
-//
-//         if (parts[0]) {
-//             return parts[0]
-//         }
-//     }
-//
-//     return 'http'
-// }
