@@ -1,5 +1,5 @@
 import * as connect from 'connect'
-import { InlineConfig } from 'vite'
+import { InlineConfig, PreviewOptions } from 'vite'
 
 export interface PluginConfig {
     /**
@@ -20,6 +20,10 @@ export interface PluginConfig {
          * Whether to set process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0' in DEV SSR
          */
         nodeTlsRejectUnauthorized?: boolean
+    }
+    preview?: {
+        replacer?: (html: string) => string
+        options?: PreviewOptions
     }
 }
 

@@ -55,7 +55,7 @@ export type AppEntryPoint<
     T = unknown | ((request: connect.IncomingMessage) => unknown),
     RD = Record<string, unknown>,
 > = (
-    request: connect.IncomingMessage,
+    path: string,
     data: T,
     template: string,
     ssrManifest?: SSRManifest,

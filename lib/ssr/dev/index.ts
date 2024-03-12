@@ -2,10 +2,11 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import type { ServerResponse } from 'node:http'
 import { IncomingMessage, NextHandleFunction } from 'connect'
-import { ViteDevServer } from 'vite'
+import { PreviewServer, ViteDevServer } from 'vite'
 import { AppEntryPoint } from '../types'
 import { isRedirect } from '../plugins/redirect'
 import { PluginConfig } from '../../config'
+import { getExpressPath } from '../index.ts'
 
 export const createSSRDevHandler = async (
     server: ViteDevServer,
@@ -56,7 +57,8 @@ export const createSSRDevHandler = async (
                 (options.ssr?.serverEntryData &&
                     options.ssr.serverEntryData(request)) ||
                 undefined
-            const rendered = await render(request, entryData, template)
+            const path = getExpressPath(request)
+            const rendered = await render(path, entryData, template)
             const { redirectLocation, status, cookies, ssrContext } = rendered
             let { html } = rendered
 
@@ -98,6 +100,54 @@ export const createSSRDevHandler = async (
             response.end(template)
             logServerError(error as Error, server)
         }
+    }
+}
+
+export const createServeBuildHandler = (
+    server: PreviewServer,
+    options: PluginConfig = {},
+): NextHandleFunction => {
+    const outDir =
+        server.config.build?.outDir ??
+        path.resolve(server.config.root, 'dist/client')
+    // const outDir = path.resolve(distDir, 'client')
+    const indexHtmlPath = path.resolve(outDir, 'index.html')
+    let indexHtmlContents = fs.readFileSync(indexHtmlPath, 'utf-8')
+
+    if (options.preview?.replacer) {
+        indexHtmlContents = options.preview.replacer(indexHtmlContents)
+    }
+
+    return async (request: IncomingMessage, response: ServerResponse, next) => {
+        if (
+            request.method !== 'GET' ||
+            request.originalUrl === '/favicon.ico'
+        ) {
+            return next()
+        }
+
+        const fileOnDisk = path.resolve(
+            outDir,
+            request.originalUrl?.substring(1) || '',
+        )
+
+        if (
+            '/index.html' !== request.originalUrl &&
+            fs.existsSync(fileOnDisk)
+        ) {
+            const stat = fs.lstatSync(fileOnDisk)
+
+            if (!stat.isDirectory()) {
+                return next()
+            }
+        }
+
+        response.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Cache-Control': 'no-cache',
+        })
+
+        return response.end(indexHtmlContents)
     }
 }
 

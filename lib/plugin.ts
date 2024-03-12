@@ -1,16 +1,39 @@
-import type { PluginOption } from 'vite'
+import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type { PluginConfig } from './config'
-import { createSSRDevHandler } from './ssr/dev'
+import { createServeBuildHandler, createSSRDevHandler } from './ssr/dev'
+import path from 'node:path'
 
 export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
     return {
         name: PLUGIN_NAME,
         [PLUGIN_NAME]: options,
-        config() {
-            return {
+
+        config(config: UserConfig, env: ConfigEnv) {
+            const conf: UserConfig = {
                 ssr: {
                     noExternal: [PLUGIN_NAME],
                 },
+            }
+
+            if ('serve' === env.command && env.isPreview) {
+                if (!conf.build) {
+                    conf.build = {}
+                }
+
+                const distDir =
+                    config.build?.outDir ?? path.resolve(process.cwd(), 'dist')
+                conf.build.outDir = path.resolve(distDir, 'client')
+
+                conf.preview = options.preview?.options
+            }
+
+            return conf
+        },
+        configurePreviewServer(server) {
+            return () => {
+                return server.middlewares.use(
+                    createServeBuildHandler(server, options),
+                )
             }
         },
         async configureServer(server) {

@@ -8,7 +8,7 @@ import {
 } from 'vite'
 import replace from '@rollup/plugin-replace'
 import fs from 'fs'
-import path from 'path'
+import path from 'node:path'
 import { JSDOM } from 'jsdom'
 import type {
     OutputAsset,
