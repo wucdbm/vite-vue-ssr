@@ -1,6 +1,6 @@
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type { PluginConfig } from './config'
-import { createServeBuildHandler, createSSRDevHandler } from './ssr/dev'
+import { createPreviewHandler, createSSRDevHandler } from './ssr/dev'
 import path from 'node:path'
 
 export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
@@ -32,7 +32,7 @@ export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
         configurePreviewServer(server) {
             return () => {
                 return server.middlewares.use(
-                    createServeBuildHandler(server, options),
+                    createPreviewHandler(server, options),
                 )
             }
         },

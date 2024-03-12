@@ -103,7 +103,7 @@ export const createSSRDevHandler = async (
     }
 }
 
-export const createServeBuildHandler = (
+export const createPreviewHandler = (
     server: PreviewServer,
     options: PluginConfig = {},
 ): NextHandleFunction => {
