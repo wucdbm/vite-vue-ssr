@@ -156,14 +156,6 @@ export const createLivenessAndReadinessHandler = (
     return async (request: IncomingMessage, response: ServerResponse, next) => {
         const readiness = options.probes?.readiness
 
-        console.log(
-            'wat',
-            request.originalUrl,
-            readiness?.path,
-            options,
-            options.probes,
-        )
-
         if (request.originalUrl === readiness?.path) {
             response.writeHead(readiness?.statusCode || 204)
             return response.end()
