@@ -25,6 +25,17 @@ export interface PluginConfig {
         replacer?: (html: string) => string
         options?: PreviewOptions
     }
+    probes?: ProbesConfig
+}
+
+export interface ProbesConfig {
+    readiness?: ProbeConfig
+    liveness?: ProbeConfig
+}
+
+export interface ProbeConfig {
+    path?: string
+    statusCode?: number
 }
 
 export interface BuildOptions {

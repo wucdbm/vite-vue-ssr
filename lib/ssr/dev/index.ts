@@ -10,7 +10,7 @@ import { getExpressPath } from '../index.ts'
 
 export const createSSRDevHandler = async (
     server: ViteDevServer,
-    options: PluginConfig = {},
+    options: PluginConfig,
 ): Promise<NextHandleFunction> => {
     const resolveFilePath = (p: string) => path.resolve(server.config.root, p)
 
@@ -105,12 +105,11 @@ export const createSSRDevHandler = async (
 
 export const createPreviewHandler = (
     server: PreviewServer,
-    options: PluginConfig = {},
+    options: PluginConfig,
 ): NextHandleFunction => {
     const outDir =
         server.config.build?.outDir ??
         path.resolve(server.config.root, 'dist/client')
-    // const outDir = path.resolve(distDir, 'client')
     const indexHtmlPath = path.resolve(outDir, 'index.html')
     let indexHtmlContents = fs.readFileSync(indexHtmlPath, 'utf-8')
 
@@ -148,6 +147,36 @@ export const createPreviewHandler = (
         })
 
         return response.end(indexHtmlContents)
+    }
+}
+
+export const createLivenessAndReadinessHandler = (
+    options: PluginConfig,
+): NextHandleFunction => {
+    return async (request: IncomingMessage, response: ServerResponse, next) => {
+        const readiness = options.probes?.readiness
+
+        console.log(
+            'wat',
+            request.originalUrl,
+            readiness?.path,
+            options,
+            options.probes,
+        )
+
+        if (request.originalUrl === readiness?.path) {
+            response.writeHead(readiness?.statusCode || 204)
+            return response.end()
+        }
+
+        const liveness = options.probes?.liveness
+
+        if (request.originalUrl === liveness?.path) {
+            response.writeHead(liveness?.statusCode || 204)
+            return response.end()
+        }
+
+        return next()
     }
 }
 

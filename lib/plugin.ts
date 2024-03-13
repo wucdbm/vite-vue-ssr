@@ -1,6 +1,10 @@
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type { PluginConfig } from './config'
-import { createPreviewHandler, createSSRDevHandler } from './ssr/dev'
+import {
+    createLivenessAndReadinessHandler,
+    createPreviewHandler,
+    createSSRDevHandler,
+} from './ssr/dev'
 import path from 'node:path'
 
 export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
@@ -31,19 +35,22 @@ export function WucdbmViteVueSsr(options: PluginConfig = {}): PluginOption {
         },
         configurePreviewServer(server) {
             return () => {
-                return server.middlewares.use(
-                    createPreviewHandler(server, options),
+                server.middlewares.use(
+                    createLivenessAndReadinessHandler(options),
                 )
+                server.middlewares.use(createPreviewHandler(server, options))
             }
         },
         async configureServer(server) {
+            server.middlewares.use(createLivenessAndReadinessHandler(options))
+
             if (process.env.DEV_SSR) {
                 if (false === options.ssr?.nodeTlsRejectUnauthorized) {
                     process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
                 }
 
                 const handler = await createSSRDevHandler(server, options)
-                return () => server.middlewares.use(handler)
+                server.middlewares.use(handler)
             }
         },
     } as PluginOption
