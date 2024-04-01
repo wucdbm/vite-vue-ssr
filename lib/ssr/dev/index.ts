@@ -31,6 +31,26 @@ export const createSSRDevHandler = async (
             return next()
         }
 
+        if (request.originalUrl?.startsWith('/@vite')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/src')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/node_modules')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/@id')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/_hmr')) {
+            return next()
+        }
+
         let template: string
 
         try {
