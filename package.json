@@ -2,7 +2,7 @@
     "name": "wucdbm-vite-vue-ssr",
     "private": false,
     "description": "Vue/Vite utility for building your app and running SSR in DEV",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

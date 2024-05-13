@@ -21,7 +21,10 @@ export type RedirectLocation = {
     status?: number
 }
 
-export type RedirectFunction = (location: string, status?: number) => void
+export type RedirectFunction = (
+    location: string,
+    status?: number,
+) => Promise<void>
 
 export function useServerRedirect(): ServerRedirect {
     const deferred = defer<string>()
@@ -31,7 +34,7 @@ export function useServerRedirect(): ServerRedirect {
         deferred,
         redirectLocation,
         isRedirect: () => isRedirect(redirectLocation),
-        redirect: (location: string, status = 302) => {
+        redirect: async (location: string, status = 302): Promise<void> => {
             const newLocation: RedirectLocation = {
                 url: location,
                 status: status,
@@ -46,11 +49,11 @@ export function useServerRedirect(): ServerRedirect {
 }
 
 export function useClientRedirect(
-    spaRedirect: (location: string, status?: number) => void,
+    spaRedirect: (location: string, status?: number) => Promise<void>,
 ): RedirectFunction {
-    return (location: string, status?: number) => {
+    return async (location: string, status?: number): Promise<void> => {
         if (location.startsWith('/')) {
-            return spaRedirect(location, status)
+            await spaRedirect(location, status)
         } else {
             window.location.href = location
         }
