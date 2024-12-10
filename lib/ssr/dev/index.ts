@@ -97,9 +97,12 @@ export const createSSRDevHandler = async (
 
                     const id = v[0].substring(1)
 
-                    html = html.replace(
-                        `<div id="${id}"></div>`,
-                        `<div id="${id}">${v[1]}</div>`,
+                    const regExString = `<div id="${id}"([a-zA-Z\\s]+)*([^>]+)*(?:>(.*?)</div>)`
+                    const regExp = new RegExp(regExString, 'g')
+
+                    html = html.replaceAll(
+                        regExp,
+                        `<div id="${id}"$1$2>$3${v[1]}</div>`,
                     )
                 })
             }
