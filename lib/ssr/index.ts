@@ -2,8 +2,8 @@ import * as connect from 'connect'
 import { renderToString, SSRContext } from '@vue/server-renderer'
 import type { SSRHeadPayload } from '@unhead/ssr'
 import { renderSSRHead } from '@unhead/ssr'
+import { serializeState, StateSerializer } from './utils/state'
 
-import { serializeState } from './utils/state'
 import {
     AppFactory,
     Hooks,
@@ -22,12 +22,14 @@ import { Unhead } from '@unhead/schema'
 
 export async function renderApp<R = Record<string, unknown>>({
     factory,
+    stateSerializer,
     replacer,
     path,
     ssrManifest,
     hooks,
 }: {
     factory: AppFactory
+    stateSerializer?: StateSerializer
     replacer: HtmlReplacer
     path: string
     ssrManifest?: SSRManifest
@@ -101,7 +103,11 @@ export async function renderApp<R = Record<string, unknown>>({
         }
     }
 
-    const initialState = serializeState(getState())
+    if (!stateSerializer) {
+        stateSerializer = serializeState
+    }
+
+    const initialState = stateSerializer(getState())
     const coreDependencies = JSON.parse(
         '{"__WITE_CORE_DEPS__":[]}',
     ).__WITE_CORE_DEPS__

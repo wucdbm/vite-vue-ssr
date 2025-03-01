@@ -14,6 +14,8 @@ function escapeUnsafeChars(unsafeChar: string) {
     return ESCAPED_CHARS[unsafeChar as keyof typeof ESCAPED_CHARS]
 }
 
+export type StateSerializer = (state: any) => string
+
 export function serializeState(state: any) {
     try {
         // Wrap the serialized JSON in quotes so that it's parsed by the browser as a string for better performance.
