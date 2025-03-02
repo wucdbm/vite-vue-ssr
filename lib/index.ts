@@ -4,6 +4,7 @@ export {
     provideRedirect,
     useRedirect,
     useClientRedirect,
+    type RedirectFunction,
 } from './ssr/plugins/redirect'
 export { deserializeState, serializeState } from './ssr/utils/state'
 export {
