@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'rolldown-vite'
 import { resolve } from 'path'
 import { name } from './package.json'
 

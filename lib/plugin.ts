@@ -1,4 +1,4 @@
-import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
+import type { ConfigEnv, PluginOption, UserConfig } from 'rolldown-vite'
 import type { PluginConfig } from './config'
 import {
     createLivenessAndReadinessHandler,

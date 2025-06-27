@@ -1,5 +1,5 @@
 import * as connect from 'connect'
-import { InlineConfig, PreviewOptions } from 'vite'
+import { InlineConfig, PreviewOptions } from 'rolldown-vite'
 
 export interface PluginConfig {
     /**

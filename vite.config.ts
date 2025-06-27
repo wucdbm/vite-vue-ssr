@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'rolldown-vite'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
 import { name } from './package.json'

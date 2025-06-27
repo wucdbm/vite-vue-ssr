@@ -2,7 +2,7 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import type { ServerResponse } from 'node:http'
 import { IncomingMessage, NextHandleFunction } from 'connect'
-import { PreviewServer, ViteDevServer } from 'vite'
+import { PreviewServer, ViteDevServer } from 'rolldown-vite'
 import { AppEntryPoint } from '../types'
 import { isRedirect } from '../plugins/redirect'
 import { PluginConfig } from '../../config'
@@ -198,8 +198,8 @@ export const createLivenessAndReadinessHandler = (
 // This code is copied directly from Vite source (it is not exported)
 
 import chalk from 'chalk'
-import type { RollupError } from 'rollup'
-import type { ErrorPayload /* ViteDevServer */ } from 'vite'
+import type { RollupError } from 'rolldown'
+import type { ErrorPayload /* ViteDevServer */ } from 'rolldown-vite'
 
 function logServerError(
     error: Error | RollupError,

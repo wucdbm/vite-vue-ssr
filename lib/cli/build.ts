@@ -5,7 +5,7 @@ import {
     ResolvedConfig,
     Plugin,
     InlineConfig,
-} from 'vite'
+} from 'rolldown-vite'
 import replace from '@rollup/plugin-replace'
 import fs from 'fs'
 import path from 'node:path'
@@ -13,10 +13,10 @@ import { JSDOM } from 'jsdom'
 import type {
     OutputAsset,
     OutputOptions,
-    RollupOutput,
-    RollupWatcher,
-    RollupWatcherEvent,
-} from 'rollup'
+    RolldownOutput,
+    RolldownWatcher,
+    RolldownWatcherEvent,
+} from 'rolldown'
 import { PluginConfig } from '../config'
 
 export interface CliConfig {
@@ -99,7 +99,7 @@ async function doBuildClientAndServer(
         // This is a normal one-off build
         const rollupOutputs = Array.isArray(clientResult)
             ? clientResult
-            : [clientResult as RollupOutput]
+            : [clientResult as RolldownOutput]
         const clientOutputs = rollupOutputs.flatMap((result) => result.output)
 
         // Get the index.html from the resulting bundle.
@@ -160,7 +160,7 @@ async function doBuildClientAndServer(
     // This is a build watcher
     let resolved = false
 
-    clientResult.on('event', async (event: RollupWatcherEvent) => {
+    clientResult.on('event', async (event: RolldownWatcherEvent) => {
         const code = event.code
 
         if ('BUNDLE_END' !== code) {
@@ -298,8 +298,8 @@ async function resolveServerOptions(
 }
 
 function isWatching(
-    result: RollupOutput | RollupOutput[] | RollupWatcher,
-): result is RollupWatcher {
+    result: RolldownOutput | RolldownOutput[] | RolldownWatcher,
+): result is RolldownWatcher {
     return Object.prototype.hasOwnProperty.call(result, '_maxListeners')
 }
 
