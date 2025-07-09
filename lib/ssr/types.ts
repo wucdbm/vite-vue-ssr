@@ -47,7 +47,7 @@ export type HtmlReplacer = (
 ) => string
 export type AppFactory = () => AppFactoryResult | Promise<AppFactoryResult>
 export type Hooks<RD = Record<string, unknown>> = {
-    onRouterReady?: () => void
+    onRouterReady?: () => Promise<void>
     getResponseData?: () => Promise<RD>
 }
 export type SSRManifest = Record<string, string[]>

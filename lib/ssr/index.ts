@@ -1,5 +1,9 @@
 import * as connect from 'connect'
-import { renderToString, SSRContext } from '@vue/server-renderer'
+import {
+    renderToNodeStream,
+    renderToString,
+    SSRContext,
+} from '@vue/server-renderer'
 import type { SSRHeadPayload } from '@unhead/ssr'
 import { renderSSRHead } from '@unhead/ssr'
 import { serializeState, StateSerializer } from './utils/state'
@@ -19,6 +23,19 @@ import {
 } from './plugins/redirect'
 import { createSetStatusState, provideSetStatus } from './plugins/status'
 import { Unhead } from '@unhead/schema'
+import { App } from 'vue'
+import { Deferred } from './utils/defer.ts'
+import { Readable } from 'node:stream'
+
+export type RenderAppArgs<R> = {
+    factory: AppFactory
+    stateSerializer?: StateSerializer
+    replacer: HtmlReplacer
+    path: string
+    ssrManifest?: SSRManifest
+    hooks?: Hooks<R>
+    abortController?: AbortController
+}
 
 export async function renderApp<R = Record<string, unknown>>({
     factory,
@@ -27,14 +44,8 @@ export async function renderApp<R = Record<string, unknown>>({
     path,
     ssrManifest,
     hooks,
-}: {
-    factory: AppFactory
-    stateSerializer?: StateSerializer
-    replacer: HtmlReplacer
-    path: string
-    ssrManifest?: SSRManifest
-    hooks?: Hooks<R>
-}): Promise<ServerSideResponse<R>> {
+    abortController,
+}: RenderAppArgs<R>): Promise<ServerSideResponse<R>> {
     const {
         app,
         router,
@@ -62,25 +73,25 @@ export async function renderApp<R = Record<string, unknown>>({
     await router.isReady()
 
     if (isRedirect()) {
-        const responseData =
-            hooks && hooks.getResponseData && (await hooks.getResponseData())
+        const responseData = await hooks?.getResponseData?.()
 
         return returnRedirect(redirectLocation, responseData)
     }
 
-    if (hooks && hooks.onRouterReady) {
-        await hooks.onRouterReady()
-    }
+    await hooks?.onRouterReady?.()
 
     const ssrContext: SSRContext = {}
-    renderToString(app, ssrContext)
-        .then(deferred.resolve)
-        .catch(deferred.reject)
+
+    if (abortController) {
+        renderAppToStream(app, ssrContext, deferred, abortController)
+    } else {
+        renderAppToString(app, ssrContext, deferred)
+    }
+
     const body = await deferred.promise
 
     if (isRedirect()) {
-        const responseData =
-            hooks && hooks.getResponseData && (await hooks.getResponseData())
+        const responseData = await hooks?.getResponseData?.()
 
         return returnRedirect(redirectLocation, responseData)
     }
@@ -132,6 +143,62 @@ export async function renderApp<R = Record<string, unknown>>({
 
         cookies: getCookies?.(),
     }
+}
+
+function renderAppToString(
+    app: App,
+    ssrContext: SSRContext,
+    deferred: Deferred<string>,
+): void {
+    renderToString(app, ssrContext)
+        .then(deferred.resolve)
+        .catch(deferred.reject)
+}
+
+function renderAppToStream(
+    app: App,
+    ssrContext: SSRContext,
+    deferred: Deferred<string>,
+    abortController: AbortController,
+): void {
+    const readable: Readable = renderToNodeStream(app, ssrContext)
+
+    let stop = false
+    const promise = Promise.resolve().then(async () => {
+        const chunks = []
+        // By default, exiting the loop will also cancel the stream, so that it can no longer be used.
+        // To continue to use a stream after exiting the loop, pass { preventCancel: true } to the stream's values() method.
+        for await (const chunk of readable) {
+            chunks.push(chunk)
+
+            if (stop) {
+                break
+            }
+        }
+
+        return Buffer.concat(chunks).toString()
+    })
+
+    promise
+        .then((r) => {
+            if (stop) {
+                return
+            }
+
+            deferred.resolve(r)
+        })
+        .catch((e) => {
+            if (stop) {
+                return
+            }
+
+            deferred.reject(e)
+        })
+
+    deferred.promise.then(() => {
+        stop = true
+        abortController.abort()
+    })
 }
 
 async function renderHead(head: Unhead | undefined): Promise<SSRHeadPayload> {
