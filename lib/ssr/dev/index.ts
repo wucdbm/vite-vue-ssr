@@ -26,7 +26,8 @@ export const createSSRDevHandler = async (
     return async (request: IncomingMessage, response: ServerResponse, next) => {
         if (
             request.method !== 'GET' ||
-            request.originalUrl === '/favicon.ico'
+            request.originalUrl === '/favicon.ico' ||
+            request.originalUrl === '/favicon.png'
         ) {
             return next()
         }
@@ -48,6 +49,14 @@ export const createSSRDevHandler = async (
         }
 
         if (request.originalUrl?.startsWith('/_hmr')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/browserconfig.xml')) {
+            return next()
+        }
+
+        if (request.originalUrl?.startsWith('/manifest.json')) {
             return next()
         }
 
