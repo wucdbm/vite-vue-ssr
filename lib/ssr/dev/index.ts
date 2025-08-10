@@ -5,7 +5,7 @@ import { IncomingMessage, NextHandleFunction } from 'connect'
 import { PreviewServer, ViteDevServer } from 'vite'
 import { AppEntryPoint } from '../types'
 import { isRedirect } from '../plugins/redirect'
-import { PluginConfig } from '../../config'
+import { defaultIgnoreUrl, PluginConfig } from '../../config'
 import { getExpressPath } from '../index.ts'
 
 export const createSSRDevHandler = async (
@@ -23,40 +23,10 @@ export const createSSRDevHandler = async (
         return await server.transformIndexHtml(url, indexHtml)
     }
 
+    const ignoreUrl = options.ssr?.ignoreUrl || defaultIgnoreUrl
+
     return async (request: IncomingMessage, response: ServerResponse, next) => {
-        if (
-            request.method !== 'GET' ||
-            request.originalUrl === '/favicon.ico' ||
-            request.originalUrl === '/favicon.png'
-        ) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/@vite')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/src')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/node_modules')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/@id')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/_hmr')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/browserconfig.xml')) {
-            return next()
-        }
-
-        if (request.originalUrl?.startsWith('/manifest.json')) {
+        if (ignoreUrl(request)) {
             return next()
         }
 

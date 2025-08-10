@@ -1,5 +1,6 @@
 import * as connect from 'connect'
 import { InlineConfig, PreviewOptions } from 'vite'
+import { IncomingMessage } from 'connect'
 
 export interface PluginConfig {
     /**
@@ -15,6 +16,7 @@ export interface PluginConfig {
     build?: BuildOptions
     polyfills?: boolean
     ssr?: {
+        ignoreUrl?: (request: connect.IncomingMessage) => boolean
         serverEntryData?: (request: connect.IncomingMessage) => any
         /**
          * Whether to set process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0' in DEV SSR
@@ -26,6 +28,50 @@ export interface PluginConfig {
         options?: PreviewOptions
     }
     probes?: ProbesConfig
+}
+
+export function defaultIgnoreUrl(request: IncomingMessage): boolean {
+    if (
+        request.method !== 'GET' ||
+        request.originalUrl === '/favicon.ico' ||
+        request.originalUrl === '/favicon.png'
+    ) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/@vite')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/src')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/node_modules')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/@id')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/_hmr')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/favicon')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/applesplash')) {
+        return true
+    }
+
+    if (request.originalUrl?.startsWith('/browserconfig.xml')) {
+        return true
+    }
+
+    return !!request.originalUrl?.startsWith('/manifest.json')
 }
 
 export interface ProbesConfig {

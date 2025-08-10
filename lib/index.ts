@@ -19,3 +19,4 @@ export {
     createPreloadHeaders,
     getExpressPath,
 } from './ssr/index'
+export { type PluginConfig, defaultIgnoreUrl } from './config'
